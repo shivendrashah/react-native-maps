@@ -9,6 +9,7 @@ import decorateMapComponent, {
   UIManagerCommand,
 } from './decorateMapComponent';
 import {LatLng, LineCapType, LineJoinType, Point} from './sharedTypes';
+import { Commands, MapPolylineNativeComponentType } from './MapPolylineNativeComponent';
 
 export type MapPolylineProps = ViewProps & {
   /**
@@ -146,7 +147,7 @@ export type MapPolylineProps = ViewProps & {
   zIndex?: number;
 };
 
-type NativeProps = MapPolylineProps & {ref: React.RefObject<View>};
+export type NativeProps = MapPolylineProps & {ref: React.RefObject<MapPolylineNativeComponentType>};
 
 export class MapPolyline extends React.Component<MapPolylineProps> {
   // declaration only, as they are set through decorateMap
@@ -159,11 +160,23 @@ export class MapPolyline extends React.Component<MapPolylineProps> {
 
   constructor(props: MapPolylineProps) {
     super(props);
-    this.polyline = React.createRef<View>();
+    this.polyline = React.createRef<MapPolylineNativeComponentType>();
   }
 
   setNativeProps(props: Partial<NativeProps>) {
+    // @ts-ignore
     this.polyline.current?.setNativeProps(props);
+    this.startPolylineAnimation = this.startPolylineAnimation.bind(this);
+  }
+
+  startPolylineAnimation(staticColor: string, animationDuration: number = 500) {
+    if (this.polyline.current) {
+      Commands.startPolylineAnimation(
+        this.polyline.current,
+        staticColor,
+        animationDuration,
+      );
+    }
   }
 
   render() {
@@ -194,7 +207,7 @@ export default decorateMapComponent(MapPolyline, 'Polyline', {
   },
 });
 
-type PolylinePressEvent = NativeSyntheticEvent<{
+export type PolylinePressEvent = NativeSyntheticEvent<{
   action: 'polyline-press';
 
   /**

@@ -5,6 +5,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.facebook.react.R;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
@@ -344,6 +345,11 @@ public class MapManager extends ViewGroupManager<MapView> {
         }
     }
 
+    @ReactProp(name = "accessibilityLabel")
+    public void setAccessibilityLabel(MapView view, @Nullable String accessibilityLabel) {
+        view.setTag(R.id.accessibility_label, accessibilityLabel);
+    }
+
     @Override
     public void receiveCommand(@NonNull MapView view, String commandId, @Nullable ReadableArray args) {
         int duration;
@@ -388,6 +394,12 @@ public class MapManager extends ViewGroupManager<MapView> {
                 );
                 view.animateToRegion(bounds, duration);
                 break;
+
+            case "scrollMap":
+                if (args == null) {
+                    break;
+                }
+                view.scrollMap((float) args.getDouble(0), (float) args.getDouble(1), args.getBoolean(2));
 
             case "fitToElements":
                 if (args == null) {
