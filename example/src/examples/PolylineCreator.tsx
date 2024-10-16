@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import MapView, {Polyline} from 'react-native-maps';
+import MapView, {LatLng, Polyline} from 'react-native-maps';
 
 const {width, height} = Dimensions.get('window');
 
@@ -18,7 +18,46 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 let id = 0;
 
+const polyCoordinates: LatLng[] = [
+  { latitude: 37.78825, longitude: -122.4324 },
+  { latitude: 37.78825, longitude: -122.4314 },
+  { latitude: 37.78825, longitude: -122.4304 },
+  { latitude: 37.78825, longitude: -122.4294 },
+  { latitude: 37.78825, longitude: -122.4284 },
+  { latitude: 37.78825, longitude: -122.4274 },
+  { latitude: 37.78825, longitude: -122.4264 },
+  { latitude: 37.78825, longitude: -122.4254 },
+  { latitude: 37.78825, longitude: -122.4244 },
+  { latitude: 37.78825, longitude: -122.4234 },
+  { latitude: 37.78825, longitude: -122.4224 },
+  { latitude: 37.78825, longitude: -122.4214 },
+  { latitude: 37.78825, longitude: -122.4204 },
+  { latitude: 37.78825, longitude: -122.4194 },
+  { latitude: 37.78825, longitude: -122.4184 },
+  { latitude: 37.78825, longitude: -122.4174 },
+  { latitude: 37.78825, longitude: -122.4164 },
+  { latitude: 37.78825, longitude: -122.4154 },
+  { latitude: 37.78825, longitude: -122.4144 },
+  { latitude: 37.78825, longitude: -122.4134 },
+  { latitude: 37.78825, longitude: -122.4124 },
+  { latitude: 37.78825, longitude: -122.4114 },
+  { latitude: 37.78825, longitude: -122.4104 },
+  { latitude: 37.78825, longitude: -122.4094 },
+  { latitude: 37.78825, longitude: -122.4084 },
+  { latitude: 37.78825, longitude: -122.4074 },
+  { latitude: 37.78825, longitude: -122.4064 },
+  { latitude: 37.78825, longitude: -122.4054 },
+  { latitude: 37.78825, longitude: -122.4044 },
+  { latitude: 37.78825, longitude: -122.4034 },
+  { latitude: 37.78825, longitude: -122.4024 },
+  { latitude: 37.78825, longitude: -122.4014 },
+  { latitude: 37.78825, longitude: -122.4004 }
+];
+
+
+
 class PolylineCreator extends React.Component<any, any> {
+  polyRef: any
   constructor(props: any) {
     super(props);
 
@@ -61,6 +100,10 @@ class PolylineCreator extends React.Component<any, any> {
     }
   }
 
+  startAnimation() {
+    this.polyRef.startPolylineAnimation("#8D25FB", 15)
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -76,7 +119,7 @@ class PolylineCreator extends React.Component<any, any> {
               coordinates={polyline.coordinates}
               strokeColor="#000"
               fillColor="rgba(255,0,0,0.5)"
-              strokeWidth={1}
+              strokeWidth={5}
             />
           ))}
           {this.state.editing && (
@@ -85,9 +128,12 @@ class PolylineCreator extends React.Component<any, any> {
               coordinates={this.state.editing.coordinates}
               strokeColor="#F00"
               fillColor="rgba(255,0,0,0.5)"
-              strokeWidth={1}
+              strokeWidth={5}
             />
           )}
+          <Polyline ref={ref => {
+              this.polyRef = ref;
+            }} coordinates={polyCoordinates} strokeColor="#8D25FB" strokeWidth={10}/>
         </MapView>
         <View style={styles.buttonContainer}>
           {this.state.editing && (
@@ -96,7 +142,13 @@ class PolylineCreator extends React.Component<any, any> {
               style={[styles.bubble, styles.button]}>
               <Text>Finish</Text>
             </TouchableOpacity>
+            
           )}
+           <TouchableOpacity
+              onPress={() => this.startAnimation()}
+              style={[styles.bubble, styles.button]}>
+              <Text>Animation</Text>
+            </TouchableOpacity>
         </View>
       </View>
     );

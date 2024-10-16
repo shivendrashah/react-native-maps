@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -100,6 +101,22 @@ public class MapPolylineManager extends ViewGroupManager<MapPolyline> {
   @ReactProp(name = "strokeColors")
   public void setStrokeColors(MapPolyline view, ReadableArray colors){
     view.setStrokeColors(colors);
+  }
+
+  @Override
+  public void receiveCommand(@NonNull MapPolyline view, String commandId, @Nullable ReadableArray args) {
+    int staticColor;
+    int animationDuration;
+
+      if (commandId.equals("startPolylineAnimation")) {
+          if (args == null) {
+              return;
+          }
+          staticColor = Color.parseColor("#8D25FB");
+          animationDuration = args.getInt(1);
+
+          view.startPolylineAnimation(staticColor, animationDuration);
+      }
   }
 
   @Override
