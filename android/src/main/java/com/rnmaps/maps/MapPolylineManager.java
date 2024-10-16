@@ -112,7 +112,7 @@ public class MapPolylineManager extends ViewGroupManager<MapPolyline> {
           if (args == null) {
               return;
           }
-          staticColor = Color.parseColor("#8D25FB");
+          staticColor = Color.parseColor("#8D25");
           animationDuration = args.getInt(1);
 
           view.startPolylineAnimation(staticColor, animationDuration);

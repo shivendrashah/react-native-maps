@@ -53,10 +53,12 @@ public class MapPolyline extends MapFeature {
 
   // Start animation method
   public void startPolylineAnimation(final int staticColor, final int animationDuration) {
-    System.out.println("Inside startPolylineAnimation ->" + staticColor);
+    System.out.println("Inside startPolylineAnimation ---------------> " + staticColor);
 
     // Clear any ongoing animation
     stopPolylineAnimation();
+
+    this.animateColor = staticColor;
 
     // Initialize animation timer
     animationTimer = new Timer();
@@ -124,7 +126,7 @@ public class MapPolyline extends MapFeature {
     // Phase 2: Fading Phase for the animated polyline
     else if (drawDone > 100 && drawDone <= 200) {
       float alpha = (drawDone - 100.0f) / 100.0f;
-      int newColor = interpolateColor(animateColor, staticColor, alpha);
+      int newColor = interpolateColor(animateColor, color, alpha);
       animatedPolyline.setColor(newColor);
 
       // At the end of the fading phase, bring the static polyline to the front
