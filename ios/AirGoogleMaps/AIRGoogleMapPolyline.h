@@ -31,6 +31,15 @@
 @property (nonatomic, assign) int zIndex;
 @property (nonatomic, assign) BOOL tappable;
 
+@property (nonatomic, strong) AIRGMSPolyline *animatedPolyline;
+@property (nonatomic, strong) NSTimer *animationTimer;
+@property (nonatomic) CGFloat drawDone; // A percentage value to track drawing progress
+@property (nonatomic, strong) UIColor *animateColor;
+@property (nonatomic) BOOL isAnimating; // Animation state
+
+-(void)startPolylineAnimation:(UIColor *)animateColor animationDuration:(CGFloat)animationDuration delay:(CGFloat)delay;
+-(void)stopPolylineAnimation;
+
 @end
 
 #endif
