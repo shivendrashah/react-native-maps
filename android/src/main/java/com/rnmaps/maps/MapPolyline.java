@@ -41,7 +41,7 @@ public class MapPolyline extends MapFeature {
   private ReadableArray patternValues;
   private List<PatternItem> pattern;
   private StyleSpan styleSpan = null;
-  private int animateColor = Color.parseColor("#D1D5DB"); // Default animation color
+  private int animateColor = Color.parseColor("#FFFFFF");
   private Timer animationTimer;
   private TimerTask animationTask;
   private float drawDone = 0;
@@ -51,46 +51,38 @@ public class MapPolyline extends MapFeature {
     super(context);
   }
 
-  // Start animation method
-  public void startPolylineAnimation(final int staticColor, final int animationDuration) {
-    System.out.println("Inside startPolylineAnimation ---------------> " + staticColor);
-
-    // Clear any ongoing animation
+  public void startPolylineAnimation(final int animateColor, final int animationDuration, final int delay) {
     stopPolylineAnimation();
+    this.animateColor = animateColor;
 
-    this.animateColor = staticColor;
+    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+      animationTimer = new Timer();
+      drawDone = 0;
+      isAnimating = true;
 
-    // Initialize animation timer
-    animationTimer = new Timer();
-    drawDone = 0;
-    isAnimating = true;
+      animationTask = new TimerTask() {
+        @Override
+        public void run() {
+          if (drawDone <= 28) {
+            drawDone += 2;
+          } else if (drawDone <= 66) {
+            drawDone += 4;
+          } else if (drawDone <= 98) {
+            drawDone += 2;
+          } else if (drawDone <= 200) {
+            drawDone += 2;
+          } else {
+            drawDone = 0;
+          }
 
-    // Create and schedule the animation task
-    animationTask = new TimerTask() {
-      @Override
-      public void run() {
-        if (drawDone <= 28) {
-          drawDone += 2;
-        } else if (drawDone <= 66) {
-          drawDone += 4;
-        } else if (drawDone <= 98) {
-          drawDone += 2;
-        } else if (drawDone <= 200) {
-          drawDone += 2;
-        } else {
-          drawDone = 0;  // Restart the animation
+          new Handler(Looper.getMainLooper()).post(() -> updatePolyline(color));
         }
+      };
 
-        // Update polylines on the UI thread
-        new Handler(Looper.getMainLooper()).post(() -> updatePolyline(staticColor));
-      }
-    };
-
-    // Schedule the task
-    animationTimer.schedule(animationTask, 200, animationDuration);
+      animationTimer.schedule(animationTask, 200, animationDuration);
+    }, delay);
   }
 
-  // Method to stop the polyline animation
   public void stopPolylineAnimation() {
     if (animationTimer != null) {
       animationTimer.cancel();
@@ -103,53 +95,43 @@ public class MapPolyline extends MapFeature {
     isAnimating = false;
   }
 
-  // Method to update the polylines (static and animated) dynamically
   private void updatePolyline(final int staticColor) {
-    if (animatedPolyline == null || polyline == null || coordinates == null || coordinates.size() == 0) return;
+    if (animatedPolyline == null || polyline == null || coordinates == null || coordinates.isEmpty()) return;
 
-    // Phase 1: Drawing Phase for the animated polyline (adding coordinates incrementally)
     if (drawDone >= 0 && drawDone <= 100) {
       int pointCount = coordinates.size();
       int countToAdd = (int) (pointCount * (drawDone / 100.0f));
 
-      // Create a sublist of the original coordinates that grows over time
       List<LatLng> updatedPoints = new ArrayList<>(coordinates.subList(0, countToAdd));
 
-      // Set the updated points on the animated polyline
       animatedPolyline.setPoints(updatedPoints);
       animatedPolyline.setColor(animateColor);
-      animatedPolyline.setVisible(true);  // Ensure the animated polyline is visible
+      animatedPolyline.setVisible(true);
 
-      // Keep the static polyline unchanged and below the animated one
       polyline.setVisible(true);
     }
-    // Phase 2: Fading Phase for the animated polyline
     else if (drawDone > 100 && drawDone <= 200) {
       float alpha = (drawDone - 100.0f) / 100.0f;
-      int newColor = interpolateColor(animateColor, color, alpha);
+      int newColor = fadeColorToStatic(animateColor, color, alpha);
       animatedPolyline.setColor(newColor);
 
-      // At the end of the fading phase, bring the static polyline to the front
       if (drawDone == 200) {
         polyline.setVisible(true);
-        animatedPolyline.setVisible(false);  // Hide the animated polyline temporarily
-        drawDone = 0;  // Reset the animation to start again
+        animatedPolyline.setVisible(false);
+        drawDone = 0;
       }
     }
   }
 
-  // Helper method to interpolate between two colors
-  private int interpolateColor(int fromColor, int toColor, float fraction) {
-    float[] from = new float[3], to = new float[3];
-    Color.colorToHSV(fromColor, from);
-    Color.colorToHSV(toColor, to);
 
-    float[] result = new float[3];
-    result[0] = from[0] + (to[0] - from[0]) * fraction;
-    result[1] = from[1] + (to[1] - from[1]) * fraction;
-    result[2] = from[2] + (to[2] - from[2]) * fraction;
-
-    return Color.HSVToColor(result);
+  private int fadeColorToStatic(int animateColor, int staticColor, float fraction) {
+    fraction = Math.max(0, Math.min(fraction, 1));
+    int fromAlpha = (int) (255 * (1 - fraction));
+    int fadedAnimateColor = Color.argb(fromAlpha, Color.red(animateColor), Color.green(animateColor), Color.blue(animateColor));
+    if (fraction >= 1) {
+      return staticColor;
+    }
+    return fadedAnimateColor;
   }
 
   public void setCoordinates(ReadableArray coordinates) {
@@ -285,7 +267,7 @@ public class MapPolyline extends MapFeature {
   @Override
   public void removeFromMap(Object collection) {
     PolylineManager.Collection polylineCollection = (PolylineManager.Collection) collection;
-    stopPolylineAnimation();  // Stop the animation when removing
+    stopPolylineAnimation(); 
     polylineCollection.remove(polyline);
     polylineCollection.remove(animatedPolyline);
 

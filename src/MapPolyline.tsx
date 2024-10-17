@@ -161,21 +161,29 @@ export class MapPolyline extends React.Component<MapPolylineProps> {
   constructor(props: MapPolylineProps) {
     super(props);
     this.polyline = React.createRef<MapPolylineNativeComponentType>();
+    this.startPolylineAnimation = this.startPolylineAnimation.bind(this);
+    this.stopPolylineAnimation = this.stopPolylineAnimation.bind(this);
   }
 
   setNativeProps(props: Partial<NativeProps>) {
     // @ts-ignore
     this.polyline.current?.setNativeProps(props);
-    this.startPolylineAnimation = this.startPolylineAnimation.bind(this);
   }
 
-  startPolylineAnimation(staticColor: string, animationDuration: number = 500) {
+  startPolylineAnimation(staticColor: string, animationDuration: number, delay: number) {
     if (this.polyline.current) {
       Commands.startPolylineAnimation(
         this.polyline.current,
         staticColor,
         animationDuration,
+        delay
       );
+    }
+  }
+
+  stopPolylineAnimation() {
+    if (this.polyline.current) {
+      Commands.stopPolylineAnimation(this.polyline.current);
     }
   }
 
