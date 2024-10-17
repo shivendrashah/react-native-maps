@@ -136,7 +136,8 @@ export declare class MapPolyline extends React.Component<MapPolylineProps> {
     private polyline;
     constructor(props: MapPolylineProps);
     setNativeProps(props: Partial<NativeProps>): void;
-    startPolylineAnimation(staticColor: string, animationDuration?: number): void;
+    startPolylineAnimation(staticColor: string, animationDuration: number, delay: number): void;
+    stopPolylineAnimation(): void;
     render(): React.JSX.Element;
 }
 declare const _default: typeof MapPolyline;

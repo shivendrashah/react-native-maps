@@ -105,18 +105,25 @@ public class MapPolylineManager extends ViewGroupManager<MapPolyline> {
 
   @Override
   public void receiveCommand(@NonNull MapPolyline view, String commandId, @Nullable ReadableArray args) {
-    int staticColor;
+    int animateColor;
     int animationDuration;
+    int delay;
 
-      if (commandId.equals("startPolylineAnimation")) {
-          if (args == null) {
-              return;
-          }
-          staticColor = Color.parseColor("#8D25");
-          animationDuration = args.getInt(1);
+    switch (commandId) {
+      case "startPolylineAnimation":
+        if (args == null) {
+          return;
+        }
+        animateColor = Color.parseColor(args.getString(0));
+        animationDuration = args.getInt(1);
+        delay = args.getInt(2);
+        view.startPolylineAnimation(animateColor, animationDuration, delay);
+        break;
 
-          view.startPolylineAnimation(staticColor, animationDuration);
-      }
+      case "stopPolylineAnimation":
+        view.stopPolylineAnimation();
+        break;
+    }
   }
 
   @Override
